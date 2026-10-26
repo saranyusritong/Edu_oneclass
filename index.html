@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ติดตั้ง EDUOneClass</title>
+<meta name="description" content="ติดตั้ง EDUOneClass ไว้บนหน้าจอมือถือ/แท็บเล็ต เปิดได้ในแตะเดียว">
+<meta name="theme-color" content="#1d4ed8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="EDUOneClass">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta property="og:title" content="ติดตั้ง EDUOneClass ไว้บนหน้าจอ">
+<meta property="og:description" content="เปิดระบบห้องเรียนออนไลน์ได้ในแตะเดียว ไม่ต้องโหลดจาก Store">
+<meta property="og:image" content="icon-512.png">
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+  /* ติดตั้งแล้วและเปิดจากไอคอน → เข้าระบบทันที ไม่ต้องเห็นหน้านี้ */
+  (function () {
+    var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    if (standalone) { location.replace('app.html?source=pwa'); return; }
+    /* เปิดจากแชท LINE → สั่งให้ LINE เปิดในเบราว์เซอร์จริง (Safari/Chrome) เพราะในแอป LINE ติดตั้งไม่ได้ */
+    if (/\bLine\//i.test(navigator.userAgent) && !/openExternalBrowser=1/.test(location.search)) {
+      location.replace(location.pathname + (location.search ? location.search + '&' : '?') + 'openExternalBrowser=1' + location.hash);
+    }
+  })();
+</script>
+<script src="config.js"></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue2:#2563eb; --blue-soft:#eff6ff; --blue-line:#bfdbfe;
+    --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0; --card:#ffffff;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    font-family:'Mitr',sans-serif; color:var(--ink); min-height:100vh;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(37,99,235,.10) 1px, transparent 0) 0 0/22px 22px,
+      linear-gradient(180deg,#e0ecff 0%,#f5f9ff 45%,#ffffff 100%);
+    padding:calc(28px + env(safe-area-inset-top,0px)) 16px calc(28px + env(safe-area-inset-bottom,0px));
+  }
+  .wrap{ max-width:460px; margin:0 auto; }
+  .card{
+    background:var(--card); border:1px solid #dbe7ff; border-radius:28px;
+    box-shadow:0 24px 60px -24px rgba(29,78,216,.35), 0 2px 6px rgba(15,23,42,.04);
+    padding:56px 22px 22px; position:relative; margin-top:44px;
+  }
+  .logo{
+    position:absolute; left:50%; top:-46px; transform:translateX(-50%);
+    width:92px; height:92px; border-radius:24px; background:#fff; padding:5px;
+    box-shadow:0 12px 30px -8px rgba(29,78,216,.45);
+  }
+  .logo img{ width:100%; height:100%; border-radius:20px; display:block; }
+  h1{ text-align:center; font-size:22px; font-weight:600; margin:2px 0 4px; letter-spacing:.2px; }
+  h1 b{ color:var(--blue); font-weight:600; }
+  .sub{ text-align:center; color:var(--muted); font-size:13.5px; margin:0; font-weight:300; }
+  .school{ text-align:center; color:var(--blue); font-size:12.5px; margin:4px 0 0; }
+
+  .feats{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:20px 0 18px; }
+  .feat{ background:var(--blue-soft); border-radius:16px; padding:12px 6px 11px; text-align:center; }
+  .feat i{ font-style:normal; display:inline-flex; width:30px; height:30px; border-radius:50%; align-items:center; justify-content:center;
+           background:#dbeafe; color:var(--blue); margin-bottom:5px; }
+  .feat i svg{ width:16px; height:16px; }
+  .feat span{ display:block; font-size:12.5px; line-height:1.45; color:var(--ink2); }
+
+  .btn{ display:flex; align-items:center; justify-content:center; gap:9px; width:100%; border-radius:999px;
+        font-family:inherit; font-size:16px; font-weight:500; padding:13px 18px; cursor:pointer; text-decoration:none;
+        transition:transform .12s ease, box-shadow .2s ease, background .2s; -webkit-tap-highlight-color:transparent; }
+  .btn:active{ transform:scale(.98); }
+  .btn svg{ width:20px; height:20px; flex:none; }
+  .btn-outline{ background:#fff; color:var(--blue); border:2px solid var(--blue2); }
+  .btn-primary{ background:linear-gradient(135deg,var(--blue2),var(--blue)); color:#fff; border:0;
+                box-shadow:0 10px 24px -10px rgba(29,78,216,.8); }
+  .btn-ghost{ background:#f8fafc; color:var(--ink2); border:1.5px dashed #cbd5e1; font-size:15px; }
+  .btn-ghost.ready{ background:#fff; border:1.5px solid var(--blue-line); color:var(--ink); box-shadow:0 6px 16px -10px rgba(29,78,216,.5); }
+  #installBtn{ display:none; margin-bottom:10px; }
+
+  hr{ border:0; border-top:1.5px dashed var(--line); margin:20px 0 16px; }
+  .sec-title{ display:flex; align-items:center; gap:8px; font-weight:500; font-size:15.5px; margin:0 0 10px; }
+  .sec-title svg{ width:18px; height:18px; color:var(--blue); }
+
+  .tabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:5px; border:1.5px solid var(--line); border-radius:16px; margin-bottom:12px; }
+  .tab{ border:0; background:transparent; font-family:inherit; font-size:15px; color:var(--muted); padding:10px 6px; border-radius:12px;
+        display:flex; align-items:center; justify-content:center; gap:7px; cursor:pointer; }
+  .tab svg{ width:17px; height:17px; }
+  .tab.active{ background:linear-gradient(135deg,var(--blue2),var(--blue)); color:#fff; font-weight:500; box-shadow:0 6px 14px -8px rgba(29,78,216,.9); }
+
+  .hint{ text-align:center; color:var(--muted); font-size:12.5px; margin:6px 0 12px; }
+  .steps{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+  .steps li{ display:flex; gap:12px; align-items:flex-start; background:#f6f9ff; border-radius:16px; padding:12px 14px; }
+  .num{ flex:none; width:26px; height:26px; border-radius:50%; background:var(--blue2); color:#fff; font-size:13px; font-weight:600;
+        display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .steps .t{ font-size:14.5px; color:var(--ink2); line-height:1.55; }
+  .steps .t b{ color:var(--ink); font-weight:600; }
+  .steps .s{ display:block; font-size:12.5px; color:var(--muted); margin-top:2px; }
+  .ico{ display:inline-flex; vertical-align:-3px; color:var(--blue); }
+  .ico svg{ width:17px; height:17px; }
+  .panel{ display:none; } .panel.active{ display:block; }
+
+  .warn{ display:none; background:#fff7ed; border:1.5px solid #fed7aa; color:#9a3412; border-radius:16px; padding:12px 14px;
+         font-size:13.5px; line-height:1.6; margin-bottom:14px; }
+  .warn.show{ display:block; }
+  .warn b{ color:#7c2d12; }
+  .copy{ margin-top:8px; font-family:inherit; font-size:13px; border:0; border-radius:999px; padding:7px 14px; background:#f97316; color:#fff; cursor:pointer; }
+
+  .done{ display:none; background:#f0fdf4; border:1.5px solid #86efac; color:#166534; border-radius:16px; padding:12px 14px;
+         font-size:14px; text-align:center; margin-bottom:12px; }
+  .done.show{ display:block; }
+
+  details.qr{ margin-top:16px; background:#f8fafc; border-radius:16px; padding:10px 14px; }
+  details.qr summary{ cursor:pointer; font-size:13.5px; color:var(--ink2); list-style:none; display:flex; align-items:center; gap:8px; }
+  details.qr summary::-webkit-details-marker{ display:none; }
+  #qrbox{ display:flex; justify-content:center; padding:14px 0 6px; }
+  #qrbox img, #qrbox canvas{ border:10px solid #fff; border-radius:12px; box-shadow:0 4px 14px rgba(15,23,42,.08); }
+  .qrurl{ text-align:center; font-size:12px; color:var(--muted); word-break:break-all; margin:4px 0 6px; }
+
+  .foot{ text-align:center; font-size:12.5px; color:var(--muted); margin-top:18px; }
+  .foot b{ color:var(--blue); font-weight:500; }
+  .toast{ position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(20px);
+          background:#0f172a; color:#fff; padding:10px 18px; border-radius:999px; font-size:13.5px; opacity:0; transition:all .3s; pointer-events:none; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  @media (max-width:360px){ .feat span{ font-size:11.5px; } h1{ font-size:20px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="logo"><img src="logo-256.png" alt="EDUOneClass"></div>
+    <h1>ติดตั้ง <b id="appName">EDUOneClass</b><br><span style="white-space:nowrap">ไว้บนหน้าจอ</span></h1>
+    <p class="sub" id="tagline">ระบบจัดการสารสนเทศและการเรียนรู้ออนไลน์</p>
+    <p class="school" id="school" hidden></p>
+
+    <div class="feats">
+      <div class="feat"><i><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z"/></svg></i><span>เปิดเร็ว<br>ในแตะเดียว</span></div>
+      <div class="feat"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></i><span>เต็มจอ<br>เหมือนแอป</span></div>
+      <div class="feat"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></i><span>ไม่ต้องโหลด<br>จาก Store</span></div>
+    </div>
+
+    <div class="warn" id="inappWarn">
+      <b>⚠️ เปิดอยู่ในแอปแชท</b><br>ติดตั้งจากในแอปนี้ไม่ได้ กด <b>⋯</b> หรือ <b>⋮</b> มุมจอ แล้วเลือก <b>“เปิดในเบราว์เซอร์”</b> (Safari / Chrome) หรือคัดลอกลิงก์ไปเปิดเอง
+      <br><button type="button" class="copy" onclick="copyLink()">📋 คัดลอกลิงก์</button>
+    </div>
+
+    <div class="done" id="doneMsg">🎉 ติดตั้งเรียบร้อย! กลับไปที่หน้าจอหลัก แล้วแตะไอคอน <b>EDUOneClass</b> ได้เลย</div>
+
+    <a class="btn btn-outline" href="app.html" id="openBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      เปิด EDUOneClass เลย
+    </a>
+
+    <hr>
+    <p class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>วิธีติดตั้ง</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tab-ios" type="button" onclick="setTab('ios')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.1-1.2 2.9-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.4-.9-2.4-3.9zM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>
+        iPhone / iPad
+      </button>
+      <button class="tab" id="tab-android" type="button" onclick="setTab('android')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.5 19.4 6.4a.4.4 0 0 0-.7-.4l-1.8 3.1A10.9 10.9 0 0 0 12 8c-1.8 0-3.4.4-4.9 1.1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1C3.6 11 1.8 13.8 1.5 17h21c-.3-3.2-2.1-6-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>
+        Android
+      </button>
+    </div>
+
+    <!-- ── iPhone / iPad ── -->
+    <div class="panel" id="panel-ios">
+      <a class="btn btn-ghost" id="safariBtn" href="#">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#1e88e5"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z" fill="#fff"/><path d="m13.3 13.3-4.8 2.2 2.2-4.8z" fill="#ef4444"/></svg>
+        <span id="safariTxt">เปิดด้วย Safari</span>
+      </a>
+      <p class="hint" id="iosHint">iPhone / iPad ติดตั้งจาก Safari</p>
+      <ol class="steps">
+        <li><span class="num">1</span><span class="t">เปิดหน้านี้ด้วย <b>Safari</b> แล้วแตะปุ่ม <b>แชร์</b> <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>
+          <span class="s">iOS รุ่นใหม่: แตะ ⋯ ที่แถบล่างก่อน แล้วเลือก แชร์ · บน iPad ปุ่มแชร์อยู่มุมขวาบน</span></span></li>
+        <li><span class="num">2</span><span class="t">เลื่อนลงแล้วเลือก <b>เพิ่มไปยังหน้าจอโฮม</b> <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span>
+          <span class="s">ถ้าไม่เห็น ให้แตะ “แก้ไขการทำงาน” ท้ายรายการแล้วเพิ่มเข้ามา</span></span></li>
+        <li><span class="num">3</span><span class="t">แตะ <b>เพิ่ม</b> มุมขวาบน · ไอคอน EDUOneClass จะอยู่บนหน้าจอโฮมทันที</span></li>
+      </ol>
+    </div>
+
+    <!-- ── Android ── -->
+    <div class="panel" id="panel-android">
+      <button class="btn btn-primary" id="installBtn" type="button" onclick="doInstall()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+        ติดตั้งแอป EDUOneClass
+      </button>
+      <a class="btn btn-ghost" id="chromeBtn" href="#">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ea4335"/><path d="M12 2a10 10 0 0 1 8.7 5H12a5 5 0 0 0-4.6 3L4.5 5.1A10 10 0 0 1 12 2z" fill="#ea4335"/><path d="M20.7 7A10 10 0 0 1 12 22l4.3-7.5A5 5 0 0 0 16.9 9z" fill="#fbbc04"/><path d="M12 22A10 10 0 0 1 4.5 5.1L8.8 12.5A5 5 0 0 0 16.3 14.5z" fill="#34a853"/><circle cx="12" cy="12" r="4.2" fill="#fff"/><circle cx="12" cy="12" r="3.3" fill="#4285f4"/></svg>
+        <span id="chromeTxt">เปิดด้วย Chrome</span>
+      </a>
+      <p class="hint" id="androidHint">ใช้บน Android</p>
+      <ol class="steps">
+        <li><span class="num">1</span><span class="t">แตะปุ่ม <b>ติดตั้งแอป EDUOneClass</b> ด้านบน
+          <span class="s">ถ้าไม่เห็นปุ่ม: แตะเมนู <b>⋮</b> มุมขวาบนของ Chrome</span></span></li>
+        <li><span class="num">2</span><span class="t">เลือก <b>ติดตั้งแอป</b> หรือ <b>เพิ่มลงในหน้าจอหลัก</b></span></li>
+        <li><span class="num">3</span><span class="t">แตะ <b>ติดตั้ง</b> · ไอคอน EDUOneClass จะอยู่บนหน้าจอหลักทันที</span></li>
+      </ol>
+    </div>
+
+    <details class="qr" id="qrDetails">
+      <summary>🔳 QR Code ให้นักเรียนสแกนเพื่อติดตั้ง (สำหรับครู)</summary>
+      <div id="qrbox"></div>
+      <div class="qrurl" id="qrurl"></div>
+      <button type="button" class="btn btn-ghost ready" style="font-size:13.5px;padding:9px" onclick="copyLink()">📋 คัดลอกลิงก์หน้านี้</button>
+    </details>
+  </div>
+  <p class="foot"><b>EDUOneClass</b> · ระบบห้องเรียนออนไลน์สำหรับนักเรียนและครู</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  var C = window.EDU_CONFIG || {};
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/i.test(ua);
+  var isIOSSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA|Line\/|FBAN|FBAV|Instagram/i.test(ua);
+  var isIOSOther = isIOS && !isIOSSafari;
+  var isChromeAndroid = isAndroid && /Chrome\//.test(ua) && !/SamsungBrowser|EdgA|OPR|Firefox|wv\)|Line\/|FBAN|FBAV|Instagram/i.test(ua);
+  var isSamsung = /SamsungBrowser/i.test(ua);
+  var inApp = /Line\/|FBAN|FBAV|FB_IAB|Instagram|Messenger|TikTok|MicroMessenger|; wv\)/i.test(ua);
+  var pageUrl = location.href.split('#')[0].replace(/[?&]openExternalBrowser=1/, '').replace(/\?$/, '');
+
+  // ข้อความจาก config
+  if (C.APP_NAME) document.getElementById('appName').textContent = C.APP_NAME;
+  if (C.TAGLINE) document.getElementById('tagline').textContent = C.TAGLINE;
+  if (C.SCHOOL) { var s = document.getElementById('school'); s.textContent = C.SCHOOL; s.hidden = false; }
+
+  if (inApp) document.getElementById('inappWarn').classList.add('show');
+
+  // ── แท็บ ──
+  window.setTab = function (t) {
+    ['ios', 'android'].forEach(function (k) {
+      document.getElementById('tab-' + k).classList.toggle('active', k === t);
+      document.getElementById('panel-' + k).classList.toggle('active', k === t);
+    });
+  };
+  setTab(isAndroid ? 'android' : 'ios');
+
+  // ── ปุ่ม "เปิดด้วย Safari" ──
+  var safariBtn = document.getElementById('safariBtn');
+  if (isIOSSafari) {
+    safariBtn.classList.add('ready');
+    document.getElementById('safariTxt').textContent = 'คุณเปิดด้วย Safari อยู่แล้ว ✓';
+    document.getElementById('iosHint').textContent = 'ทำตาม 3 ขั้นตอนด้านล่างได้เลย';
+    safariBtn.addEventListener('click', function (e) { e.preventDefault(); toast('แตะปุ่มแชร์ ⬆ ของ Safari แล้วเลือก “เพิ่มไปยังหน้าจอโฮม”'); });
+  } else if (isIOSOther) {
+    // iOS 17+ รองรับลิงก์ x-safari- เพื่อเด้งไป Safari
+    safariBtn.href = 'x-safari-' + pageUrl;
+    safariBtn.addEventListener('click', function () {
+      setTimeout(function () { toast('ถ้า Safari ไม่เปิด: คัดลอกลิงก์ไปวางใน Safari'); }, 1200);
+    });
+    if (/CriOS/.test(ua)) document.getElementById('iosHint').innerHTML = 'Chrome บน iPhone ก็ติดตั้งได้: แตะ <b>แชร์</b> ⬆ ที่แถบที่อยู่ → <b>เพิ่มไปยังหน้าจอโฮม</b>';
+  } else {
+    safariBtn.addEventListener('click', function (e) { e.preventDefault(); copyLink(); toast('คัดลอกลิงก์แล้ว — เปิดใน Safari บน iPhone/iPad'); });
+  }
+
+  // ── ปุ่ม "เปิดด้วย Chrome" ──
+  var chromeBtn = document.getElementById('chromeBtn');
+  if (isChromeAndroid) {
+    chromeBtn.classList.add('ready');
+    document.getElementById('chromeTxt').textContent = 'คุณเปิดด้วย Chrome อยู่แล้ว ✓';
+    chromeBtn.addEventListener('click', function (e) { e.preventDefault(); toast('แตะเมนู ⋮ มุมขวาบน → “ติดตั้งแอป”'); });
+  } else if (isAndroid) {
+    var u = new URL(pageUrl);
+    chromeBtn.href = 'intent://' + u.host + u.pathname + u.search + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(pageUrl) + ';end';
+    if (isSamsung) document.getElementById('androidHint').innerHTML = 'Samsung Internet ก็ติดตั้งได้: แตะเมนู <b>☰</b> → <b>เพิ่มหน้าลงใน</b> → <b>หน้าจอหลัก</b>';
+  } else {
+    chromeBtn.addEventListener('click', function (e) { e.preventDefault(); copyLink(); toast('คัดลอกลิงก์แล้ว — เปิดใน Chrome บนมือถือ Android'); });
+  }
+
+  // ── ติดตั้งแบบกดปุ่มเดียว (Android / Chrome / Edge บนคอม) ──
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); deferred = e;
+    document.getElementById('installBtn').style.display = 'flex';
+    if (!isIOS) setTab('android');
+  });
+  window.doInstall = function () {
+    if (!deferred) { toast('แตะเมนู ⋮ มุมขวาบน → “ติดตั้งแอป”'); return; }
+    deferred.prompt();
+    deferred.userChoice.finally(function () { deferred = null; document.getElementById('installBtn').style.display = 'none'; });
+  };
+  window.addEventListener('appinstalled', function () {
+    document.getElementById('doneMsg').classList.add('show');
+    document.getElementById('installBtn').style.display = 'none';
+  });
+
+  // ── QR / คัดลอกลิงก์ ──
+  window.copyLink = function () {
+    var done = function () { toast('📋 คัดลอกลิงก์แล้ว'); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(pageUrl).then(done, fallback); else fallback();
+    function fallback() {
+      var t = document.createElement('textarea'); t.value = pageUrl; t.style.position = 'fixed'; t.style.opacity = '0';
+      document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (e) { prompt('คัดลอกลิงก์นี้', pageUrl); } t.remove();
+    }
+  };
+  document.getElementById('qrurl').textContent = pageUrl;
+  document.getElementById('qrDetails').addEventListener('toggle', function () {
+    if (!this.open || document.getElementById('qrbox').childNodes.length) return;
+    var sc = document.createElement('script');
+    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    sc.onload = function () { new QRCode(document.getElementById('qrbox'), { text: pageUrl, width: 200, height: 200, colorDark: '#1e3a8a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); };
+    sc.onerror = function () { document.getElementById('qrbox').innerHTML = '<p style="font-size:12px;color:#94a3b8">โหลด QR ไม่ได้ (ไม่มีเน็ต)</p>'; };
+    document.head.appendChild(sc);
+  });
+
+  var tt;
+  window.toast = function (m) {
+    var el = document.getElementById('toast'); el.textContent = m; el.classList.add('show');
+    clearTimeout(tt); tt = setTimeout(function () { el.classList.remove('show'); }, 3200);
+  };
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+})();
+</script>
+</body>
+</html>
