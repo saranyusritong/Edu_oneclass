@@ -2,7 +2,7 @@
    - เก็บหน้าเปิดแอป/ไอคอนไว้ในเครื่อง → เปิดไอคอนแล้วขึ้นทันที
    - ไม่แตะข้อมูลของระบบ (Google Apps Script) เลย ข้อมูลยังสดใหม่ทุกครั้ง
    แก้ไฟล์ใดในโฟลเดอร์นี้แล้ว ให้เปลี่ยนเลขเวอร์ชันด้านล่าง (v1 → v2) เพื่อให้เครื่องนักเรียนอัปเดต */
-const CACHE = 'eduoneclass-v2';
+const CACHE = 'eduoneclass-v3';
 const SHELL = [
   './', './index.html', './app.html', './config.js', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './maskable-512.png',
